@@ -5,6 +5,7 @@ import pytube
 import requests
 from bs4 import BeautifulSoup
 from googlesearch import search as s
+import sys
 
 # Bu komutlar teker teker denenenebilir ve yeniden oluşturulabilir. Bu komutların model ile direkt etkileşimi yoktur yani 
 # burada yapılan yanlışlar modelin yapısını etkilemez fakat modelin cevabını değiştirebilir.
@@ -40,6 +41,13 @@ def convert_size(size_in_bytes):
         return f"{size_in_bytes / 1e3:.2f} KB"
     else:
         return f"{size_in_bytes} bytes"
+    
+
+# İşletim sistemi işlemleri
+class Os:
+    def __init__(self, ip):# İp?
+        pass
+
 
 
 # Dosya İşlemleri
@@ -126,6 +134,68 @@ class Program:
         except Exception as e:
             return f"Program hata Çıktısı: {str(e)}"
         
+
+class Packagemanager:
+    def __init__(self, package):
+        self.package = package
+        if "=" in self.package:
+            self.version = self.package.split("=")[-1]
+
+    def install(self):
+
+        try:
+            if self.version:
+                subprocess.check_call([sys.executable, "-m", "pip", "install", self.package + "=" + self.version])
+            else:
+                subprocess.check_call([sys.executable, "-m", "pip", "install", self.package])
+            return f"{self.package} installed successfully."
+        except Exception as e:
+            return f"Error installing {self.package}: {str(e)}"
+        
+    def uninstall(self):
+        try:
+            subprocess.check_call([sys.executable, "-m", "pip", "uninstall", "-y", self.package])
+            return f"{self.package} uninstalled successfully."
+        except Exception as e:
+            return f"Error uninstalling {self.package}: {str(e)}"
+        
+    def check(self):
+        try:
+            import pkg_resources
+            version = pkg_resources.get_distribution(self.package).version
+            return f"{self.package} version: {version}"
+        except ImportError:
+            return f"{self.package} is not installed."
+        except Exception as e:
+            return f"Error checking {self.package}: {str(e)}"
+        
+    def list(self):
+        
+        if self.package.lower() == "all":
+            try:
+                result = subprocess.run([sys.executable, "-m", "pip", "list"], capture_output=True, text=True)
+                return result.stdout
+            except Exception as e:
+                return f"Error listing installed packages: {str(e)}"
+    
+        try:
+            result = subprocess.run([sys.executable, "-m", "pip", "show", self.package], capture_output=True, text=True)
+            ret = result.stdout.strip("\n").split("\n")
+            ret = ret[:2] + ret[-2:]
+            ret = "\n".join(ret)
+            return ret
+        except Exception as e:
+            return f"Error listing dependencies for {self.package}: {str(e)}"
+        
+    def upgrade(package_name):
+        try:
+            subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", package_name])
+            return f"{package_name} upgraded successfully."
+        except Exception as e:
+            return f"Error upgrading {package_name}: {str(e)}"
+        
+
+        
 # Klasör Kontrolü
 class Folder:
     def __init__(self, path):
@@ -164,7 +234,7 @@ class YT:
         ...
 
 # Linux Terminaline Yazılabilecek komutlar (planlanıyor)
-class Terminal:
+class Command:
     ...
 
 
@@ -239,7 +309,7 @@ class Internet:
 if __name__ == "__main__":
 
 ##########################################################################################
-    command = "<file clearwrite test.txt>Dosya yazma işlemi</file clearwrite test.txt>"    # denemek istediğiniz komutlarınızı buraya girebilirsiniz
+    command = "<packagemanager list all>"    # denemek istediğiniz komutlarınızı buraya girebilirsiniz
 ##########################################################################################
     
     try:
