@@ -43,6 +43,23 @@ def convert_size(size_in_bytes):
         return f"{size_in_bytes} bytes"
     
 
+
+
+def is_connected():
+    try:
+        # Google'a bağlantıyı kontrol et
+        response = requests.get("https://www.google.com", timeout=5)
+        
+        # Eğer bağlantı başarılıysa, 200 status kodu dönecektir
+        if response.status_code == 200:
+            return True
+        else:
+            return False
+    except requests.ConnectionError:
+        return False
+    
+    
+
 # İşletim sistemi işlemleri
 class Os:
     def __init__(self, ip):# İp?
@@ -249,6 +266,8 @@ class Internet:
     # Nasıl çalışacağı daha iyi planlanıyor fakat program çalışıyor
     # Örnek çalışma şekli: <internet engine google>menemen nasıl yapılır?</internet engine google>
     def engine(self, content):
+        if not is_connected():return "İnternete bağlı değil. Lütfen tekrar deneyiniz."
+            
         if self.__url == "google":
             links = ""
             for i in s(content, tld="co.in", num=10, stop=10, pause=2):
@@ -259,7 +278,7 @@ class Internet:
     # Sitede Yazan Bilgileri Alma
     # Çalışma şekli: <internet content https://orneksite.com>
     def getcontent(self):
-
+        if not is_connected():return "İnternete bağlı değil. Lütfen tekrar deneyiniz."
         response = requests.get(self.__url)
         if response.status_code != 200:
             return f"{self.__url} sitesi okuma başarısız oldu. Durum kodu: {response.status_code}"
@@ -277,7 +296,8 @@ class Internet:
         
     # Sitedeki html Kodlarını alma
     # Çalışma şekli: <internet gethtml https://orneksite.com>
-    def gethtml(self):
+    def getcss(self):
+        if not is_connected():return "İnternete bağlı değil. Lütfen tekrar deneyiniz."
         response = requests.get(self.__url)
         if response.status_code == 200:
             html_content = response.text
@@ -309,7 +329,7 @@ class Internet:
 if __name__ == "__main__":
 
 ##########################################################################################
-    command = "<packagemanager list all>"    # denemek istediğiniz komutlarınızı buraya girebilirsiniz
+    command = "<internet getcontent https://www.haberler.com/dunya/yunan-bakan-yardimcisindan-tehdit-gibi-sozler-18204171-haberi/>"    # denemek istediğiniz komutlarınızı buraya girebilirsiniz
 ##########################################################################################
     
     try:
