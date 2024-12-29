@@ -63,9 +63,10 @@ def is_connected():
     
 
 # İşletim sistemi işlemleri
-class Os:
-    def __init__(self, ip):# İp?
-        pass
+class System:
+    def __init__(self, ip): # İp?
+        ...
+        
 
 
 
@@ -107,7 +108,7 @@ class File:
 
     # Dosya yolu kontrolü
     def path(self):
-        return self.__path
+        return f"Tam dosya yolu: {self.__path}"
 
     # Dosya silme (Önemli dosyaları silebileceğinden aktif değildir)
     # Çalışma şekli: <file removefile test.txt>
