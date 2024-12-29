@@ -6,6 +6,8 @@ import requests
 from bs4 import BeautifulSoup
 from googlesearch import search as s
 import sys
+from pytube import YouTube as yt
+
 
 # Bu komutlar teker teker denenenebilir ve yeniden oluşturulabilir. Bu komutların model ile direkt etkileşimi yoktur yani 
 # burada yapılan yanlışlar modelin yapısını etkilemez fakat modelin cevabını değiştirebilir.
@@ -226,22 +228,24 @@ class Folder:
     
     
 # Youtube İşlemleri
-class YT:
+class Yt:
     def __init__(self, url):
-        self.__url = url
+        self.__yt = yt(url)
 
     # Kanal Bilgisi Öğrenme (yapılacak)
     def channelinfo(self):
+        self.__yt.channel_url
         ...
 
     # Video Bilgisi Öğrenme (yapılacak)
     def videoinfo(self):
+        
         ...
 
     # Youtube ses/müzik yükleme (yapılacak)
     def downloadaud(self):
         ...
-
+        
     # Youtube video yükleme (yapılacak)
     def downloadvid(self):
         ...
@@ -249,6 +253,8 @@ class YT:
     # Ek İşlem (yapılacak)
     def connect(self):
         ...
+
+    
 
 # Linux Terminaline Yazılabilecek komutlar (planlanıyor)
 class Command:
@@ -320,6 +326,39 @@ class Internet:
                     print(f"{css_link} yüklenemedi.")
         else:
             print(f"HTML alınamadı. Durum kodu: {response.status_code}")
+
+    def getjs(self):
+        if not is_connected():return "İnternete bağlı değil. Lütfen tekrar deneyiniz."
+        response = requests.get(self.__url)
+        try:
+        # Ana sayfayı indir
+            response = requests.get(self.__url)
+            response.raise_for_status()  # Hata için kontrol
+            
+            # HTML'yi ayrıştır
+            soup = BeautifulSoup(response.text, "html.parser")
+            
+            # Tüm <script> etiketlerini bulun
+            script_tags = soup.find_all("script")
+            
+            # JavaScript dosyalarının içeriklerini saklamak için liste
+            js_files = []
+            
+            for tag in script_tags:
+                # Eğer src özelliği varsa (harici bir dosya)
+                if tag.get("src"):
+                    js_url = tag["src"]
+                    if not js_url.startswith("http"):  # Göreceli URL'ler için tam adres oluştur
+                        js_url = requests.compat.urljoin(self.__url, js_url)
+                    js_response = requests.get(js_url)
+                    js_files.append(js_response.text)
+                else:
+                    # Eğer inline bir JavaScript varsa
+                    js_files.append(tag.string)
+            
+            return js_files
+        except Exception as e:
+            return f"Hata: {e}"
 
 
 #############    MAIN YAPISI    ###########################
